@@ -13,7 +13,9 @@
 - 現時点では `.claude/` のみ用意する。`.copilot/` は作成しない。
 - 共通ルールは `.claude/rules/`、スキルは `.claude/skills/` に配置する。
 - 一覧ファイルは各ディレクトリ直下に置く: `.claude/rules/index.md`、`.claude/skills/index.md`。
-- セットアップの入口はリポジトリ直下の `AI_AGENT_SETUP.md` とする。
+- 毎回のセッションの入口はリポジトリ直下の `AGENTS.md` とし、`CLAUDE.md` は `@AGENTS.md` を取り込む。どちらにも `index.md` は書かない。
+- 環境を初期設定するときの手順書は `docs/setup/ai-agent-setup.md` とする。毎回は読まない。
+- `index.md` は、スキル等の自動読み込みが使えない特定環境で一括取得するための暫定回避案とする。
 - Notionは移行状況や説明の追跡に使えるが、ルール・スキル本文の正本として二重管理しない。
 
 ### 2. ChatGPTに関する制約
@@ -23,6 +25,8 @@
 したがって、ChatGPTに対する外部指示の自動注入は要件から切り離す。利用者がCustom Instructionsやプロジェクト指示に必要最小限の共通指示を手動で設定し、必要な作業時にGitHub/MCPから一覧・本文を取得して参照する方式とする。取得した外部データがシステム指示と同じ優先度になるとは扱わない。
 
 ### 3. トークン効率を重視した取得方針
+
+※ この節の `index.md` 方式は、スキル等の自動読み込みが使えない環境向けの暫定回避案。
 
 1. まずGitHub MCPで `.claude/rules/index.md` または `.claude/skills/index.md` を取得する。
 2. 共通ルールは一覧から必要なルール本文を取得する。
@@ -40,13 +44,14 @@
 - 各ターン開始フックが利用可能なら、毎ターンpullして更新を反映する構成を検討する。ネットワーク・認証エラー時は失敗を明示し、最新化済みと誤認しない。
 - フックを利用できない環境では、手動で更新・読み込みを行う。
 - 環境ごとのフック仕様を確認し、未対応のフックを想定して設定しない。
-- 環境別の手順は `AI_AGENT_SETUP.md` に記載する。
+- 環境別の手順は `docs/setup/ai-agent-setup.md` に記載する。
 
 ## 実装チェックリスト
 
-- [ ] `AI_AGENT_SETUP.md` を作成
-- [ ] `.claude/rules/index.md` と共有ルールを配置
-- [ ] `.claude/skills/index.md` とNotionに登録済みのスキルを配置
+- [x] `docs/setup/ai-agent-setup.md` を作成（当初は直下の `AI_AGENT_SETUP.md`）
+- [x] `AGENTS.md` / `CLAUDE.md` / `README.md` を作成
+- [x] `.claude/rules/index.md` と共有ルールを配置
+- [x] `.claude/skills/index.md` とNotionに登録済みのスキルを配置
 - [ ] GitHub Actionsでindexを自動生成
 - [ ] 利用するClaude環境のフック仕様を確認し、対応する設定を実装
 - [ ] 実測した取得トークン・レスポンスを基に、既存GitHub MCPで十分か評価
