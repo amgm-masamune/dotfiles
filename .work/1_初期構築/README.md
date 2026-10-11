@@ -9,10 +9,10 @@
 ### 1. 正本と配置
 
 - 共通ルール・スキル本文の正本は、このdotfilesリポジトリとする。
-- 現在Notionにあるセッション間・プロジェクト間共有ルール、およびスキルを `.claude/` に移行する。
-- 現時点では `.claude/` のみ用意する。`.copilot/` は作成しない。
-- 共通ルールは `.claude/rules/`、スキルは `.claude/skills/` に配置する。
-- 一覧ファイルは各ディレクトリ直下に置く: `.claude/rules/index.md`、`.claude/skills/index.md`。
+- 現在Notionにあるセッション間・プロジェクト間共有ルール、およびスキルを `.agents/` に移行する。
+- 現時点では `.agents/` を正本とし、`.claude/` はそのシンボリックリンクにする。`.copilot/` は作成しない。
+- 共通ルールは `.agents/rules/`、スキルは `.agents/skills/` に配置する。`.claude/rules`、`.claude/skills` はそれぞれへのシンボリックリンク（2026-10-11 に `.claude/` 直置きから変更）。
+- 一覧ファイルは `generated/rules-index.md`、`generated/skills-index.md` に置く。Claude Code は `.claude/rules/` 配下の `.md` をすべて自動で読むため、ルールの外に出した（2026-10-11 に `index.md` から変更）。
 - 毎回のセッションの入口はリポジトリ直下の `AGENTS.md` とし、`CLAUDE.md` は `@AGENTS.md` を取り込む。どちらにも `index.md` は書かない。
 - 環境を初期設定するときの手順書は `docs/setup/ai-agent-setup.md` とする。毎回は読まない。
 - `index.md` は、スキル等の自動読み込みが使えない特定環境で一括取得するための暫定回避案とする。
@@ -26,16 +26,16 @@
 
 ### 3. トークン効率を重視した取得方針
 
-※ この節の `index.md` 方式は、スキル等の自動読み込みが使えない環境向けの暫定回避案。
+※ この節の一覧（`generated/`）方式は、スキル等の自動読み込みが使えない環境向けの暫定回避案。
 
-1. まずGitHub MCPで `.claude/rules/index.md` または `.claude/skills/index.md` を取得する。
+1. まずGitHub MCPで `generated/rules-index.md` または `generated/skills-index.md` を取得する。
 2. 共通ルールは一覧から必要なルール本文を取得する。
 3. スキルは一覧から対象を選び、必要になったときだけ個別のスキル本文を取得する。
 4. 全スキル本文や無関係なディレクトリを毎回まとめて取得しない。
 5. 一覧・本文は短く保ち、構造化されたNotion DBのプロパティや不要なメタデータを取得しないことで、取得レスポンスとコンテキスト消費を抑える。
 6. GitHub MCPの導入だけでトークン効率が必ず改善すると断定しない。実際のツール定義、取得レスポンス、取得範囲を見て評価する。
 7. 既存のGitHub MCPで十分な効率が得られない場合に限り、必要なファイルだけを簡潔に返す専用MCPサーバーを検討する。専用MCPにもツール定義・運用コストがあるため、先に作らない。
-8. GitHub Actionsによる一覧の自動生成は候補とする。実装する場合、`index.md` は本文から生成する索引とし、本文を二重管理しない。
+8. GitHub Actionsによる一覧の自動生成は候補とする。実装する場合、`generated/` の一覧は本文から生成する索引とし、本文を二重管理しない。
 
 ### 4. クローン・更新・読み込み
 
@@ -50,8 +50,9 @@
 
 - [x] `docs/setup/ai-agent-setup.md` を作成（当初は直下の `AI_AGENT_SETUP.md`）
 - [x] `AGENTS.md` / `CLAUDE.md` / `README.md` を作成
-- [x] `.claude/rules/index.md` と共有ルールを配置
-- [x] `.claude/skills/index.md` とNotionに登録済みのスキルを配置
+- [x] `generated/rules-index.md` と共有ルール（`.agents/rules/`）を配置
+- [x] `generated/skills-index.md` とNotionに登録済みのスキル（`.agents/skills/`）を配置
+- [x] `.claude/rules`、`.claude/skills` を `.agents/` へのシンボリックリンクにする
 - [ ] GitHub Actionsでindexを自動生成
 - [ ] 利用するClaude環境のフック仕様を確認し、対応する設定を実装
 - [ ] 実測した取得トークン・レスポンスを基に、既存GitHub MCPで十分か評価
