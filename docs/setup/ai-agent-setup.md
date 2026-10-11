@@ -45,3 +45,41 @@ GitHub MCPを利用できる場合は、まず一覧ファイルを取得し、�
 - 取得の第一候補は、既存のGitHub MCPを使った一覧・個別ファイル取得です。専用MCPサーバーは、実測で既存方式のオーバーヘッドが問題になる場合に限って検討します。
 - GitHub Actionsで一覧を生成する場合も、一覧は生成物とし、本文を重複管理しません。
 - `.copilot/` は現時点では作成しません。必要になった段階で、ルール形式や配置先を別途判断します。
+
+## 5. Claude Code のクラウド環境（コンテナ）での自動同期
+
+`scripts/sync-dotfiles.sh` が、`~/dotfiles` への clone/pull と、`~/.claude` へのリンク追加を行います。
+
+### 動き
+
+- `~/.claude` の既存ファイル（環境が作るフック、`launcher-settings.json`、`skills/synced/` など）は消さず、上書きもしません。足すのは次のリンクだけです。
+  - `~/.claude/rules/<名前>` → `~/dotfiles/.agents/rules/<名前>`
+  - `~/.claude/skills/<名前>` → `~/dotfiles/.agents/skills/<名前>`
+- すでに別の中身がある名前は、そのまま残してスキップします。消すのは「`~/dotfiles` を指していて、リンク先が無くなったリンク」だけです。
+- `git pull` でファイルが更新されても、読み込み済みのルール本文は自動では入れ替わりません。そのため、更新されたルールだけ本文を標準出力（＝モデルのコンテキスト）に出します。削除されたルールとスキルの増減も知らせます。変化がなければ何も出しません。
+- clone/pull に失敗したときは、最新化済みとして扱わないよう、失敗を標準出力で知らせます。セッションやターンは止めません。
+- 実行ログは `~/.dotfiles-sync.log` に1行ずつ残ります（フックが実際に走ったかの確認に使えます）。
+
+### 3つのモード
+
+| モード | 呼び出し元 | 内容 |
+|---|---|---|
+| `install` | 環境のセットアップスクリプト | 同期 + リンク + `~/.claude/settings.json` へのフック登録（既存の設定は残す） |
+| `session` | SessionStart フック | 同期 + リンク。スキルが増減したら再読み込みを要求 |
+| `turn` | UserPromptSubmit フック | 同期 + リンク。更新があったルールの本文を出す |
+
+### 登録方法（要確認を含む）
+
+環境のセットアップスクリプト（claude.ai/code の環境設定。root で実行、完了後にキャッシュ）に、次を書きます。
+
+```bash
+#!/bin/bash
+git clone --depth 1 https://github.com/amgm-masamune/dotfiles ~/dotfiles && ~/dotfiles/scripts/sync-dotfiles.sh install </dev/null || true
+```
+
+- 末尾の `|| true` は、失敗してもセッションの起動を止めないためです（セットアップスクリプトは0以外で終わると、セッションが始まりません）。
+- セットアップスクリプトはキャッシュされるため、`~/dotfiles` はキャッシュ時点の内容になります。最新化は SessionStart と UserPromptSubmit のフックが行います。
+- 要確認: 公式ドキュメントは「ユーザーレベルの `~/.claude/settings.json` は自分のPCに残り、クラウドには届かない」と説明しています。コンテナ内に書いた `~/.claude/settings.json` のフックが読まれるかは、実機で確かめます。`~/.dotfiles-sync.log` に `session` と `turn` の行が増えれば、読まれています。
+- 要確認: 公式ドキュメントによると、リポジトリの `.claude/settings.json` のフックは、リポジトリが1つのセッションでだけ読まれます。複数のリポジトリが付いたセッションでは読まれません。
+- 要確認: GitHub へのアクセスは、セッションに付いたリポジトリだけを通す仕組みです。dotfiles が付いていないセッションや、dotfiles が非公開の場合は、clone/pull が 403 などで失敗することがあります。
+- 要確認: 公式ドキュメントによると、デスクトップ版の Cowork では、作業ディレクトリの外を指す `~/.claude/rules/` のリンクが無視されます。このコンテナ環境で無視されるかは未確認です。Claude Code の `/context` の Memory files に `~/.claude/rules/` のファイルが出るかで確かめます。

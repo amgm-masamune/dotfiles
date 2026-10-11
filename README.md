@@ -9,5 +9,6 @@ AIエージェントで共通に使うルールとスキルの正本です。
 - `.agents/skills/`: スキルの正本
 - `.claude/rules/`、`.claude/skills/`: 上の2つへのシンボリックリンク（Claude Code 用）
 - `generated/`: ルールとスキルの一覧。自動読み込みが使えない環境で一括取得するための暫定回避案
+- `scripts/sync-dotfiles.sh`: コンテナで `~/dotfiles` を同期し、`~/.claude` にルールとスキルのリンクを足すスクリプト
 - `docs/setup/`: 環境を初期設定するときの手順書（[AIエージェント環境のセットアップ](docs/setup/ai-agent-setup.md)）
 - `.work/`: 構築中の方針メモ

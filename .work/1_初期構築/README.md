@@ -53,6 +53,8 @@
 - [x] `generated/rules-index.md` と共有ルール（`.agents/rules/`）を配置
 - [x] `generated/skills-index.md` とNotionに登録済みのスキル（`.agents/skills/`）を配置
 - [x] `.claude/rules`、`.claude/skills` を `.agents/` へのシンボリックリンクにする
+- [x] `scripts/sync-dotfiles.sh` を作成（一時ディレクトリで clone/pull/リンク/失敗時の動作を確認。2026-10-11）
+- [ ] 環境のセットアップスクリプトに登録し、SessionStart / UserPromptSubmit のフックが実際に走ることを確認
 - [ ] GitHub Actionsでindexを自動生成
 - [ ] 利用するClaude環境のフック仕様を確認し、対応する設定を実装
 - [ ] 実測した取得トークン・レスポンスを基に、既存GitHub MCPで十分か評価
