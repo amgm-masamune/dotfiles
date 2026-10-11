@@ -6,7 +6,7 @@
 
 | スキル | 用途・トリガー | 本文 |
 |---|---|---|
-| Android CI：署名固定とビルド番号増加 | Android / CI / ビルド / APK / AAB / 署名 / keystore / versionCode / GitHub Actions | [android-ci-signing/SKILL.md](../.agents/skills/android-ci-signing/SKILL.md) |
+| Android CI：署名固定とビルド番号増加 | Android / CI / ビルド / デバッグビルド / APK / AAB / 署名 / keystore / versionCode / 更新（上書きインストール）エラー / 公開リポジトリ / Secrets / GitHub Actions | [android-ci-signing/SKILL.md](../.agents/skills/android-ci-signing/SKILL.md) |
 
 ## 運用
 
